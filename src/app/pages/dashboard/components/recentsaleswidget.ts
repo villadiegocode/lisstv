@@ -1,4 +1,4 @@
-import { Component } from '@angular/core';
+import { Component, inject } from '@angular/core';
 import { RippleModule } from 'primeng/ripple';
 import { TableModule } from 'primeng/table';
 import { ButtonModule } from 'primeng/button';
@@ -38,8 +38,7 @@ import { Product, ProductService } from '../../service/product.service';
 })
 export class RecentSalesWidget {
     products!: Product[];
-
-    constructor(private productService: ProductService) {}
+    productService = inject(ProductService);
 
     ngOnInit() {
         this.productService.getProductsSmall().then((data) => (this.products = data));

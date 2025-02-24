@@ -1,22 +1,21 @@
 import { Component, inject, signal } from '@angular/core';
 import { FormControl, FormGroup, FormsModule, ReactiveFormsModule, Validators } from '@angular/forms';
-import { Router, RouterLink, RouterModule } from '@angular/router';
+import { RouterModule } from '@angular/router';
 import { ButtonModule } from 'primeng/button';
 import { CheckboxModule } from 'primeng/checkbox';
 import { InputTextModule } from 'primeng/inputtext';
 import { PasswordModule } from 'primeng/password';
 import { RippleModule } from 'primeng/ripple';
-import { TypeGenre } from '../../enums/type';
-import { AuthService } from './services/auth.service';
-import { InvalidPipe } from '../../pipes/invalid.pipe';
 import { Message } from 'primeng/message';
+import { TypeGenre } from '../../enums/type';
 import { RequiredPipe } from '../../pipes/required.pipe';
-import { HttpStatusCode } from '@angular/common/http';
+import { InvalidPipe } from '../../pipes/invalid.pipe';
+import { AuthService } from './services/auth.service';
 
 @Component({
-    selector: 'app-login',
+    selector: 'app-register',
     standalone: true,
-    imports: [ButtonModule, CheckboxModule, InputTextModule, PasswordModule, FormsModule, RouterModule, RippleModule, RouterLink, InvalidPipe, Message, ReactiveFormsModule, RequiredPipe],
+    imports: [ButtonModule, CheckboxModule, InputTextModule, PasswordModule, FormsModule, RouterModule, RippleModule, ReactiveFormsModule, Message, RequiredPipe, InvalidPipe],
     template: `
         <div class="bg-surface-50 dark:bg-surface-950 flex items-center justify-center min-h-screen min-w-[100vw] overflow-hidden">
             <div class="flex flex-col items-center justify-center">
@@ -40,13 +39,12 @@ import { HttpStatusCode } from '@angular/common/http';
                                     />
                                 </g>
                             </svg>
-                            <div class="text-surface-900 dark:text-surface-0 text-3xl font-medium mb-4">Bienvenido a LessTV</div>
-                            <span class="text-muted-color font-medium">Inicie sesión para continuar</span>
+                            <div class="text-surface-900 dark:text-surface-0 text-3xl font-medium mb-4">Registrarse en LessTV</div>
                         </div>
 
                         <form [formGroup]="form" (ngSubmit)="submit()">
                             <div>
-                                <label for="email1" class="block text-surface-900 dark:text-surface-0 text-xl font-medium mb-2">Correo electrónico</label>
+                                <label for="email1" class="block text-surface-900 dark:text-surface-0 text-xl font-medium mb-2">Tu email</label>
                                 <div class="flex flex-col gap-2 mb-8">
                                     <input pInputText id="email1" formControlName="email" type="text" placeholder="Ingresar email..." class="w-full md:w-[30rem] " />
                                     @if (isValidField('email') || isSubmitted()) {
@@ -70,11 +68,7 @@ import { HttpStatusCode } from '@angular/common/http';
                                     }
                                 </div>
 
-                                <div class="flex items-center justify-between mt-2 mb-8 gap-8">
-                                    <span class="font-medium no-underline ml-2 text-right cursor-pointer text-primary">¿Olvido su contraseña?</span>
-                                    <span class="font-medium no-underline ml-2 text-right cursor-pointer text-primary" routerLink="/registro">Registrarse</span>
-                                </div>
-                                <p-button type="submit" label="Iniciar sesión" styleClass="w-full" [loading]="isLoading()" ></p-button>
+                                <p-button type="submit" label="Registrarme" styleClass="w-full" [loading]="isLoading()"></p-button>
                             </div>
                         </form>
                     </div>
@@ -83,11 +77,10 @@ import { HttpStatusCode } from '@angular/common/http';
         </div>
     `
 })
-export class Login {
+export class Register {
     form: FormGroup;
     typeGenre = TypeGenre;
     authService = inject(AuthService);
-    router = inject(Router);
 
     isSubmitted = signal(false);
     isLoading = signal(false);
@@ -104,23 +97,13 @@ export class Login {
         this.isLoading.set(true);
         if (this.form.invalid) return;
         console.log(this.form.value);
-        this.authService.signIn({ email: this.form.value.email, password: this.form.value.password }).subscribe({
-            next: (resp  ) => {
-                if (resp.data.session !== null && resp.data.user !== null) {
-                    this.router.navigate(['/peliculas']);
-                    console.log(resp);
-                }
-
-                if (resp.error?.status === HttpStatusCode.BadRequest) {
-                    this.router.navigate(['/error']);
-                }
-
-                this.isLoading.set(false);
-
+        this.authService.signUp({ email: this.form.value.email, password: this.form.value.password }).subscribe({
+            next: (resp) => {
+                console.log(resp);
             },
             error: (err) => {
                 console.log(err);
-            },
+            }
         })
     }
 
