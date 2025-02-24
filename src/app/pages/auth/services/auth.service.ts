@@ -26,4 +26,8 @@ export class AuthService {
 
     }
 
+    logOut(){
+        return this._supabaseClient.auth.signOut();
+    }
+
 }

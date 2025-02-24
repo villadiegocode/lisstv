@@ -1,15 +1,17 @@
 import { Component } from '@angular/core';
 import { MenuItem } from 'primeng/api';
-import { RouterModule } from '@angular/router';
+import { Popover, PopoverModule } from 'primeng/popover';
+import { TieredMenuModule } from 'primeng/tieredmenu';
+import { Router, RouterModule } from '@angular/router';
 import { CommonModule } from '@angular/common';
 import { StyleClassModule } from 'primeng/styleclass';
-import { AppConfigurator } from './app.configurator';
 import { LayoutService } from '../service/layout.service';
+import { AuthService } from '../../pages/auth/services/auth.service';
 
 @Component({
     selector: 'app-topbar',
     standalone: true,
-    imports: [RouterModule, CommonModule, StyleClassModule],
+    imports: [RouterModule, CommonModule, StyleClassModule, Popover, PopoverModule, TieredMenuModule],
     template: ` <div class="layout-topbar">
         <div class="layout-topbar-logo-container">
             <button class="layout-menu-button layout-topbar-action" (click)="layoutService.onMenuToggle()">
@@ -33,7 +35,7 @@ import { LayoutService } from '../service/layout.service';
                         />
                     </g>
                 </svg>
-                <span>LISSTV</span>
+                <span>LissTV</span>
             </a>
         </div>
 
@@ -42,6 +44,7 @@ import { LayoutService } from '../service/layout.service';
                 <button type="button" class="layout-topbar-action" (click)="toggleDarkMode()">
                     <i [ngClass]="{ 'pi ': true, 'pi-moon': layoutService.isDarkTheme(), 'pi-sun': !layoutService.isDarkTheme() }"></i>
                 </button>
+            </div>
 
             <button class="layout-topbar-menu-button layout-topbar-action" pStyleClass="@next" enterFromClass="hidden" enterActiveClass="animate-scalein" leaveToClass="hidden" leaveActiveClass="animate-fadeout" [hideOnOutsideClick]="true">
                 <i class="pi pi-ellipsis-v"></i>
@@ -49,21 +52,45 @@ import { LayoutService } from '../service/layout.service';
 
             <div class="layout-topbar-menu hidden lg:block">
                 <div class="layout-topbar-menu-content">
-                    <button type="button" class="layout-topbar-action">
+                    <button type="button" class="layout-topbar-action" (click)="toggleDataTable(op2, $event)">
                         <i class="pi pi-user"></i>
-                        <span>Profile</span>
+                        <span>Perfil</span>
                     </button>
+                    <p-popover #op2 id="overlay_panel" [style]="{ width: '200px' }">
+                    <div class="font-semibold text-xl mb-4">Sistema</div>
+                    <p-tieredmenu [model]="tieredMenuItems"></p-tieredmenu>
+
+                    </p-popover>
                 </div>
             </div>
         </div>
     </div>`
 })
 export class AppTopbar {
-    items!: MenuItem[];
+    tieredMenuItems: MenuItem[] = [
+        {
+            label: 'Cerrar sesión',
+            icon: 'pi pi-fw pi-sign-out',
+            command: ()=> this.logOut()
+        }];
 
-    constructor(public layoutService: LayoutService) {}
+    constructor(public layoutService: LayoutService, private authService: AuthService, private router: Router) {}
 
     toggleDarkMode() {
         this.layoutService.layoutConfig.update((state) => ({ ...state, darkTheme: !state.darkTheme }));
     }
+
+
+    toggleDataTable(op: Popover, event: any) {
+        op.toggle(event);
+    }
+
+    async logOut(){
+        await this.authService.logOut();
+        this.router.navigateByUrl('/auth');
+
+
+    }
+
+
 }

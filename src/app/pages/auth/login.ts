@@ -107,7 +107,7 @@ export class Login {
         this.authService.signIn({ email: this.form.value.email, password: this.form.value.password }).subscribe({
             next: (resp  ) => {
                 if (resp.data.session !== null && resp.data.user !== null) {
-                    this.router.navigate(['/peliculas']);
+                    this.router.navigate(['/tendencias']);
                     console.log(resp);
                 }
 
