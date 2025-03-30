@@ -1,6 +1,6 @@
 import { Component, inject, signal } from '@angular/core';
 import { FormControl, FormGroup, FormsModule, ReactiveFormsModule, Validators } from '@angular/forms';
-import { RouterModule } from '@angular/router';
+import { Router, RouterModule } from '@angular/router';
 import { ButtonModule } from 'primeng/button';
 import { CheckboxModule } from 'primeng/checkbox';
 import { InputTextModule } from 'primeng/inputtext';
@@ -81,6 +81,7 @@ export class Register {
     form: FormGroup;
     typeGenre = TypeGenre;
     authService = inject(AuthService);
+    router = inject(Router);
 
     isSubmitted = signal(false);
     isLoading = signal(false);
@@ -99,7 +100,9 @@ export class Register {
         console.log(this.form.value);
         this.authService.signUp({ email: this.form.value.email, password: this.form.value.password }).subscribe({
             next: (resp) => {
-                console.log(resp);
+                if(resp){
+                    this.router.navigateByUrl("/auth/login");
+                }
             },
             error: (err) => {
                 console.log(err);
